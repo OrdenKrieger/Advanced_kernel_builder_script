@@ -43,6 +43,9 @@ OUTPUT_EMPTY_CHECK="1"
 
 # Enable/Disable colors for the build
 COLOR_TXT="1"
+
+# Enable/Disable clear the history of the kernel source (ONLY ON SUCCESS on error not for debug)
+CLEAR_ON_SUCCESS="1"
 #########################################################################################################################
 #########################################################################################################################
 
@@ -168,6 +171,10 @@ fi
 # Check if lazyflasher made a .zip and this is working right
 file2="$ZIP_MOVE/*.zip"
 if [ -e $file1 ] &&  [ -e $file2 ]; then
+if [ $CLEAR_ON_SUCCESS == 1 ]; then
+	rm ~/.bash_history
+	reset 
+fi
 	echo -e "\E[1;32mThe ZIP is created successful"
 	echo -e ""
 	echo -e "\E[1;32mYou can find the compiled file inside of $ZIP_MOVE"
