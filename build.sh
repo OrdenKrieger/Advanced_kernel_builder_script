@@ -1,6 +1,6 @@
 #!/bin/bash
 # Kernel Details
-VER="V1.1.4_axon7"
+VER="V1.1.4_axon7_alpha"
 BASE_AK_VER="Radioactive"
 
 # Paths (should be set as one of the first so that everything know where it belong to)
