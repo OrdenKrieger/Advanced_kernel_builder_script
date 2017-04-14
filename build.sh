@@ -34,6 +34,15 @@ MODULES_DIR="$LAZYFLASHER_DIR/modules" #No changes needed
 
 # Set output folder
 ZIP_MOVE="$BUILD_DIR/releases"
+
+# Builder script headline
+HEADLINE_TXT="Advanced kernel builder script by OrdenKrieger"
+
+# Enable/Disable output folder cleanup dialog
+OUTPUT_EMPTY_CHECK="1"
+
+# Enable/Disable colors for the build
+COLOR_TXT="1"
 #########################################################################################################################
 #########################################################################################################################
 
@@ -43,12 +52,14 @@ ZIP_MOVE="$BUILD_DIR/releases"
 # Check if lazyflasher is present
 folder1="$LAZYFLASHER_DIR/*.*"
 if [ "$(ls -A $folder1)" ]; then
-   echo -e "\E[1;32mLazyflasher is present"
-   tput sgr0
+	echo -e ""
+	echo -e ""
+	echo -e "\E[1;32mLazyflasher is present"
+	tput sgr0
 else
-   echo -e "\E[1;31mDownloading lazyflasher dependencie"
-   tput sgr0
-   git clone $LSOURCE_GIT $LAZYFLASHER_DIR
+   	echo -e "\E[1;31mDownloading lazyflasher dependencie"
+   	tput sgr0
+   	git clone $LSOURCE_GIT $LAZYFLASHER_DIR
 fi
 
 # Check if kernel source is present
@@ -68,6 +79,41 @@ git clean -d -f -x > /dev/null 2>&1
 cd $LAZYFLASHER_DIR
 git clean -d -f -x > /dev/null 2>&1
 cd $KERNEL_DIR
+
+# Empty output?
+if [ $OUTPUT_EMPTY_CHECK == 1 ]; then
+output1="$ZIP_MOVE/*.zip"
+output2="$ZIP_MOVE/*.sha1"
+if [ -e $output1 ] &&  [ -e $output2 ]; then # Both must be there otherwise they will be ignored
+	echo -e ""
+	echo -e ""
+	echo -e "\E[1;31mOutput folder contains older versions"
+	echo -e ""
+	read -p "Empty output folder? (y/n) " prompt
+	tput sgr0
+if [[ $prompt == "y" || $prompt == "Y" || $prompt == "yes" || $prompt == "Yes" ]]; then
+	rm $ZIP_MOVE/*.zip
+	rm $ZIP_MOVE/*.sha1
+	echo -e "\E[1;31mCleanup successful!"
+	tput sgr0
+else
+	echo -e ""
+fi
+fi
+fi
+
+echo -e ""
+echo -e ""
+echo -e "\e[1;4m$HEADLINE_TXT"
+echo -e ""
+echo -e "" 
+tput sgr0
+
+if [ $COLOR_TXT == 1 ]; then
+	echo -e "\e[43m"
+	echo -e "\e[30m"
+fi
+
 
 # Vars
 export ARCH=$KERNEL_ARCH
@@ -91,6 +137,10 @@ find $KERNEL_DIR -name '*.ko' -exec cp -v {} $MODULES_DIR \;
 cd $LAZYFLASHER_DIR
 make VERSION=$VER NAME=$BASE_AK_VER
 
+if [ $COLOR_TXT == 1 ]; then
+	tput sgr0
+fi
+
 # Cleanup remains of the kernel build (drivers etc.)
 cd $KERNEL_DIR
 git clean -d -f -x > /dev/null 2>&1
@@ -103,45 +153,44 @@ mv $LAZYFLASHER_DIR/*.sha1 $ZIP_MOVE
 # Check if a zImage was created
 file1="$LAZYFLASHER_DIR/zImage"
 if [ -e $file1 ]; then
-   echo -e ""
-   echo -e ""
-   echo -e "\E[1;32mThe zImage of the kernel was created successful"
-   tput sgr0
+	echo -e ""
+	echo -e ""
+	echo -e "\E[1;32mThe zImage of the kernel was created successful"
+	tput sgr0
 else
-   echo -e ""
-   echo -e ""
-   echo -e "\E[1;31mThere is no zImage created by the build process!"
-   echo -e "\E[1;31mCheck the the build history for errors and fix them in the kernel source."
-   tput sgr0
+	echo -e ""
+	echo -e ""
+	echo -e "\E[1;31mThere is no zImage created by the build process!"
+	echo -e "\E[1;31mCheck the the build history for errors and fix them in the kernel source."
+	tput sgr0
 fi
 
 # Check if lazyflasher made a .zip and this is working right
 file2="$ZIP_MOVE/*.zip"
 if [ -e $file1 ] &&  [ -e $file2 ]; then
-   echo -e "\E[1;32mThe ZIP is created successful"
-   echo -e ""
-   echo -e "\E[1;32mYou can find the compiled file inside of $ZIP_MOVE"
-   echo -e ""
-   echo -e "\E[1;32mSuccess!"
-   echo -e ""
-   echo -e ""
-   tput sgr0
-else if [ ! -e $file1 ] ||  [ -e "$file2" ]; then
-   echo -e ""
-   echo -e "\E[1;31mAn error with the zImage appeared!" 
-   echo -e "\E[1;31mThe build process may have created a kernel.zip but this is corrupted."
-   echo -e ""
-   echo -e "\E[1;31mThe device won't boot if you flash it!"
-   echo -e ""
-   echo -e ""
-   tput sgr0
+	echo -e "\E[1;32mThe ZIP is created successful"
+	echo -e ""
+	echo -e "\E[1;32mYou can find the compiled file inside of $ZIP_MOVE"
+	echo -e ""
+	echo -e "\E[1;32mSuccess!"
+	echo -e ""
+	echo -e ""
+	tput sgr0
+elif [ ! -e $file1 ] ||  [ -e "$file2" ]; then
+	echo -e ""
+	echo -e "\E[1;31mAn error with the zImage appeared!" 
+	echo -e "\E[1;31mThe build process may have created a kernel.zip but this is corrupted."
+	echo -e ""
+	echo -e "\E[1;31mThe device won't boot if you flash it!"
+	echo -e ""
+	echo -e ""
+	tput sgr0
 else
-   echo -e "\E[1;31mThere is no kernel.zip created by the build process!"
-   echo -e "\E[1;31mCheck if lazyflasher is present and if the paths are set right in the build.sh."
-   echo -e ""
-   echo -e ""
-   tput sgr0
-fi
+	echo -e "\E[1;31mThere is no kernel.zip created by the build process!"
+	echo -e "\E[1;31mCheck if lazyflasher is present and if the paths are set right in the build.sh."
+	echo -e ""
+	echo -e ""
+	tput sgr0
 fi
 
 # Cleanup remains of the *.zip build
