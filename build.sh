@@ -173,7 +173,7 @@ file2="$ZIP_MOVE/*.zip"
 if [ -e $file1 ] &&  [ -e $file2 ]; then
 if [ $CLEAR_ON_SUCCESS == 1 ]; then
 	rm ~/.bash_history
-	reset 
+	clear
 fi
 	echo -e "\E[1;32mThe ZIP is created successful"
 	echo -e ""
