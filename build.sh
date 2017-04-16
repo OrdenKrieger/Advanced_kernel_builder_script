@@ -3,7 +3,7 @@
 #########################################################################################################################
 # Kernel Details
 VER="V1.1.5_axon7"
-BASE_AK_VER="Radioactive"
+BASE_VER="Radioactive"
 
 # Set build folder
 BUILD_DIR="${HOME}/NucleaROM"
@@ -127,9 +127,9 @@ export KBUILD_BUILD_HOST=$BUILD_HOST_NAME
 # Build info 
 THREAD="-j$(grep -c ^processor /proc/cpuinfo)"
 export CROSS_COMPILE="$TOOLCHAIN_DIR"
-AK_VER="$BASE_AK_VER$VER"
-export LOCALVERSION=~`echo $AK_VER`
-export LOCALVERSION=~`echo $AK_VER`
+AKBS_VER="$BASE_VER$VER"
+export LOCALVERSION=~`echo $AKBS_VER`
+export LOCALVERSION=~`echo $AKBS_VER`
 DEFCONFIG="$KERNEL_DEFCONFIG"
 make $DEFCONFIG
 make $THREAD
@@ -138,7 +138,7 @@ make $THREAD
 cp -vr $ZIMAGE_DIR/Image.gz-dtb $LAZYFLASHER_DIR/zImage
 find $KERNEL_DIR -name '*.ko' -exec cp -v {} $MODULES_DIR \;
 cd $LAZYFLASHER_DIR
-make VERSION=$VER NAME=$BASE_AK_VER
+make VERSION=$VER NAME=$BASE_VER
 
 if [ $COLOR_TXT == 1 ]; then
 	tput sgr0
