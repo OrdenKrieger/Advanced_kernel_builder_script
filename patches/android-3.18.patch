@@ -1,0 +1,1098 @@
+From 7207f8253054de53be02b235f8ebee2e9a383c6c Mon Sep 17 00:00:00 2001
+From: OrdenKrieger <OrdenKriegerEDR@googlemail.com>
+Date: Mon, 17 Apr 2017 02:14:45 +0200
+Subject: [PATCH] AKBS: 3.18 Kernel standalone compilation fix
+
+---
+ drivers/net/ethernet/msm/rndis_ipa.c        |   2 +-
+ drivers/net/ethernet/msm/rndis_ipa_trace.h  |  81 -----------------
+ drivers/platform/msm/ipa/ipa_v2/ipa.c       |   2 +-
+ drivers/platform/msm/ipa/ipa_v2/ipa_dp.c    |   2 +-
+ drivers/platform/msm/ipa/ipa_v2/ipa_trace.h | 135 ----------------------------
+ drivers/platform/msm/ipa/ipa_v2/rmnet_ipa.c |   2 +-
+ drivers/platform/msm/ipa/ipa_v3/ipa.c       |   2 +-
+ drivers/platform/msm/ipa/ipa_v3/ipa_dp.c    |   2 +-
+ drivers/platform/msm/ipa/ipa_v3/ipa_trace.h | 135 ----------------------------
+ drivers/platform/msm/ipa/ipa_v3/rmnet_ipa.c |   2 +-
+ drivers/soc/qcom/tracer_pkt.c               |   2 +-
+ drivers/soc/qcom/tracer_pkt_private.h       |  50 -----------
+ drivers/usb/gadget/function/f_gsi.c         |   2 +-
+ drivers/usb/gadget/function/f_midi.c        |   2 +-
+ drivers/usb/gadget/function/f_mtp.c         |   2 +-
+ drivers/usb/gadget/function/f_rndis.c       |   2 +-
+ drivers/video/msm/msm_dba/msm_dba.c         |   2 +-
+ include/trace/ipa_trace.h                   | 135 ++++++++++++++++++++++++++++
+ include/trace/ipa_trace_v3.h                | 135 ++++++++++++++++++++++++++++
+ include/trace/rndis_ipa_trace.h             |  81 +++++++++++++++++
+ include/trace/tracer_pkt_private.h          |  50 +++++++++++
+ sound/soc/msm/apq8096-auto.c                |   2 +-
+ sound/soc/msm/apq8096-i2c.c                 |   2 +-
+ sound/soc/msm/msm8996.c                     |   2 +-
+ 24 files changed, 417 insertions(+), 417 deletions(-)
+ delete mode 100644 drivers/net/ethernet/msm/rndis_ipa_trace.h
+ delete mode 100644 drivers/platform/msm/ipa/ipa_v2/ipa_trace.h
+ delete mode 100644 drivers/platform/msm/ipa/ipa_v3/ipa_trace.h
+ delete mode 100644 drivers/soc/qcom/tracer_pkt_private.h
+ create mode 100644 include/trace/ipa_trace.h
+ create mode 100644 include/trace/ipa_trace_v3.h
+ create mode 100644 include/trace/rndis_ipa_trace.h
+ create mode 100644 include/trace/tracer_pkt_private.h
+
+diff --git a/drivers/net/ethernet/msm/rndis_ipa.c b/drivers/net/ethernet/msm/rndis_ipa.c
+index 179e708..a69f435 100644
+--- a/drivers/net/ethernet/msm/rndis_ipa.c
++++ b/drivers/net/ethernet/msm/rndis_ipa.c
+@@ -29,7 +29,7 @@
+ #include <linux/workqueue.h>
+ 
+ #define CREATE_TRACE_POINTS
+-#include "rndis_ipa_trace.h"
++#include <trace/rndis_ipa_trace.h>
+ 
+ #define DRV_NAME "RNDIS_IPA"
+ #define DEBUGFS_DIR_NAME "rndis_ipa"
+diff --git a/drivers/net/ethernet/msm/rndis_ipa_trace.h b/drivers/net/ethernet/msm/rndis_ipa_trace.h
+deleted file mode 100644
+index c0fc573..0000000
+--- a/drivers/net/ethernet/msm/rndis_ipa_trace.h
++++ /dev/null
+@@ -1,81 +0,0 @@
+-/* Copyright (c) 2015, The Linux Foundation. All rights reserved.
+- *
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License version 2 and
+- * only version 2 as published by the Free Software Foundation.
+- *
+- * This program is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- */
+-
+-#undef TRACE_SYSTEM
+-#define TRACE_SYSTEM rndis_ipa
+-#define TRACE_INCLUDE_FILE rndis_ipa_trace
+-
+-#if !defined(_RNDIS_IPA_TRACE_H) || defined(TRACE_HEADER_MULTI_READ)
+-#define _RNDIS_IPA_TRACE_H
+-
+-#include <linux/tracepoint.h>
+-
+-TRACE_EVENT(
+-	rndis_netif_ni,
+-
+-	TP_PROTO(unsigned long proto),
+-
+-	TP_ARGS(proto),
+-
+-	TP_STRUCT__entry(
+-		__field(unsigned long,	proto)
+-	),
+-
+-	TP_fast_assign(
+-		__entry->proto = proto;
+-	),
+-
+-	TP_printk("proto =%lu\n", __entry->proto)
+-);
+-
+-TRACE_EVENT(
+-	rndis_tx_dp,
+-
+-	TP_PROTO(unsigned long proto),
+-
+-	TP_ARGS(proto),
+-
+-	TP_STRUCT__entry(
+-		__field(unsigned long,	proto)
+-	),
+-
+-	TP_fast_assign(
+-		__entry->proto = proto;
+-	),
+-
+-	TP_printk("proto =%lu\n", __entry->proto)
+-);
+-
+-TRACE_EVENT(
+-	rndis_status_rcvd,
+-
+-	TP_PROTO(unsigned long proto),
+-
+-	TP_ARGS(proto),
+-
+-	TP_STRUCT__entry(
+-		__field(unsigned long,	proto)
+-	),
+-
+-	TP_fast_assign(
+-		__entry->proto = proto;
+-	),
+-
+-	TP_printk("proto =%lu\n", __entry->proto)
+-);
+-
+-#endif /* _RNDIS_IPA_TRACE_H */
+-
+-/* This part must be outside protection */
+-#undef TRACE_INCLUDE_PATH
+-#define TRACE_INCLUDE_PATH .
+-#include <trace/define_trace.h>
+diff --git a/drivers/platform/msm/ipa/ipa_v2/ipa.c b/drivers/platform/msm/ipa/ipa_v2/ipa.c
+index d35140e..93a939a 100644
+--- a/drivers/platform/msm/ipa/ipa_v2/ipa.c
++++ b/drivers/platform/msm/ipa/ipa_v2/ipa.c
+@@ -38,7 +38,7 @@
+ #include "../ipa_rm_i.h"
+ 
+ #define CREATE_TRACE_POINTS
+-#include "ipa_trace.h"
++#include <trace/ipa_trace.h>
+ 
+ #define IPA_SUMMING_THRESHOLD (0x10)
+ #define IPA_PIPE_MEM_START_OFST (0x0)
+diff --git a/drivers/platform/msm/ipa/ipa_v2/ipa_dp.c b/drivers/platform/msm/ipa/ipa_v2/ipa_dp.c
+index 5b86772..ab0558e 100644
+--- a/drivers/platform/msm/ipa/ipa_v2/ipa_dp.c
++++ b/drivers/platform/msm/ipa/ipa_v2/ipa_dp.c
+@@ -16,7 +16,7 @@
+ #include <linux/list.h>
+ #include <linux/netdevice.h>
+ #include "ipa_i.h"
+-#include "ipa_trace.h"
++#include <trace/ipa_trace.h>
+ 
+ #define IPA_LAST_DESC_CNT 0xFFFF
+ #define POLLING_INACTIVITY_RX 40
+diff --git a/drivers/platform/msm/ipa/ipa_v2/ipa_trace.h b/drivers/platform/msm/ipa/ipa_v2/ipa_trace.h
+deleted file mode 100644
+index d70abdf..0000000
+--- a/drivers/platform/msm/ipa/ipa_v2/ipa_trace.h
++++ /dev/null
+@@ -1,135 +0,0 @@
+-/* Copyright (c) 2015, The Linux Foundation. All rights reserved.
+- *
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License version 2 and
+- * only version 2 as published by the Free Software Foundation.
+- *
+- * This program is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- */
+-
+-#undef TRACE_SYSTEM
+-#define TRACE_SYSTEM ipa
+-#define TRACE_INCLUDE_FILE ipa_trace
+-
+-#if !defined(_IPA_TRACE_H) || defined(TRACE_HEADER_MULTI_READ)
+-#define _IPA_TRACE_H
+-
+-#include <linux/tracepoint.h>
+-
+-TRACE_EVENT(
+-	intr_to_poll,
+-
+-	TP_PROTO(unsigned long client),
+-
+-	TP_ARGS(client),
+-
+-	TP_STRUCT__entry(
+-		__field(unsigned long,	client)
+-	),
+-
+-	TP_fast_assign(
+-		__entry->client = client;
+-	),
+-
+-	TP_printk("client=%lu", __entry->client)
+-);
+-
+-TRACE_EVENT(
+-	poll_to_intr,
+-
+-	TP_PROTO(unsigned long client),
+-
+-	TP_ARGS(client),
+-
+-	TP_STRUCT__entry(
+-		__field(unsigned long,	client)
+-	),
+-
+-	TP_fast_assign(
+-		__entry->client = client;
+-	),
+-
+-	TP_printk("client=%lu", __entry->client)
+-);
+-
+-TRACE_EVENT(
+-	idle_sleep_enter,
+-
+-	TP_PROTO(unsigned long client),
+-
+-	TP_ARGS(client),
+-
+-	TP_STRUCT__entry(
+-		__field(unsigned long,	client)
+-	),
+-
+-	TP_fast_assign(
+-		__entry->client = client;
+-	),
+-
+-	TP_printk("client=%lu", __entry->client)
+-);
+-
+-TRACE_EVENT(
+-	idle_sleep_exit,
+-
+-	TP_PROTO(unsigned long client),
+-
+-	TP_ARGS(client),
+-
+-	TP_STRUCT__entry(
+-		__field(unsigned long,	client)
+-	),
+-
+-	TP_fast_assign(
+-		__entry->client = client;
+-	),
+-
+-	TP_printk("client=%lu", __entry->client)
+-);
+-
+-TRACE_EVENT(
+-	rmnet_ipa_netifni,
+-
+-	TP_PROTO(unsigned long rx_pkt_cnt),
+-
+-	TP_ARGS(rx_pkt_cnt),
+-
+-	TP_STRUCT__entry(
+-		__field(unsigned long,	rx_pkt_cnt)
+-	),
+-
+-	TP_fast_assign(
+-		__entry->rx_pkt_cnt = rx_pkt_cnt;
+-	),
+-
+-	TP_printk("rx_pkt_cnt=%lu", __entry->rx_pkt_cnt)
+-);
+-
+-TRACE_EVENT(
+-	rmnet_ipa_netifrx,
+-
+-	TP_PROTO(unsigned long rx_pkt_cnt),
+-
+-	TP_ARGS(rx_pkt_cnt),
+-
+-	TP_STRUCT__entry(
+-		__field(unsigned long,	rx_pkt_cnt)
+-	),
+-
+-	TP_fast_assign(
+-		__entry->rx_pkt_cnt = rx_pkt_cnt;
+-	),
+-
+-	TP_printk("rx_pkt_cnt=%lu", __entry->rx_pkt_cnt)
+-);
+-
+-#endif /* _IPA_TRACE_H */
+-
+-/* This part must be outside protection */
+-#undef TRACE_INCLUDE_PATH
+-#define TRACE_INCLUDE_PATH .
+-#include <trace/define_trace.h>
+diff --git a/drivers/platform/msm/ipa/ipa_v2/rmnet_ipa.c b/drivers/platform/msm/ipa/ipa_v2/rmnet_ipa.c
+index 64dc216..4064722 100644
+--- a/drivers/platform/msm/ipa/ipa_v2/rmnet_ipa.c
++++ b/drivers/platform/msm/ipa/ipa_v2/rmnet_ipa.c
+@@ -35,7 +35,7 @@
+ #include <linux/ipa.h>
+ #include <uapi/linux/net_map.h>
+ 
+-#include "ipa_trace.h"
++#include <trace/ipa_trace.h>
+ 
+ #define WWAN_METADATA_SHFT 24
+ #define WWAN_METADATA_MASK 0xFF000000
+diff --git a/drivers/platform/msm/ipa/ipa_v3/ipa.c b/drivers/platform/msm/ipa/ipa_v3/ipa.c
+index 3f0d982..4db0cec 100644
+--- a/drivers/platform/msm/ipa/ipa_v3/ipa.c
++++ b/drivers/platform/msm/ipa/ipa_v3/ipa.c
+@@ -44,7 +44,7 @@
+ #include "ipahal/ipahal.h"
+ 
+ #define CREATE_TRACE_POINTS
+-#include "ipa_trace.h"
++#include <trace/ipa_trace_v3.h>
+ 
+ #define IPA_GPIO_IN_QUERY_CLK_IDX 0
+ #define IPA_GPIO_OUT_CLK_RSP_CMPLT_IDX 0
+diff --git a/drivers/platform/msm/ipa/ipa_v3/ipa_dp.c b/drivers/platform/msm/ipa/ipa_v3/ipa_dp.c
+index 4300936..71d6e4a 100644
+--- a/drivers/platform/msm/ipa/ipa_v3/ipa_dp.c
++++ b/drivers/platform/msm/ipa/ipa_v3/ipa_dp.c
+@@ -17,7 +17,7 @@
+ #include <linux/netdevice.h>
+ #include <linux/msm_gsi.h>
+ #include "ipa_i.h"
+-#include "ipa_trace.h"
++#include <trace/ipa_trace_v3.h>
+ #include "ipahal/ipahal.h"
+ 
+ #define IPA_LAST_DESC_CNT 0xFFFF
+diff --git a/drivers/platform/msm/ipa/ipa_v3/ipa_trace.h b/drivers/platform/msm/ipa/ipa_v3/ipa_trace.h
+deleted file mode 100644
+index 5ea6c6d..0000000
+--- a/drivers/platform/msm/ipa/ipa_v3/ipa_trace.h
++++ /dev/null
+@@ -1,135 +0,0 @@
+-/* Copyright (c) 2015, The Linux Foundation. All rights reserved.
+- *
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License version 2 and
+- * only version 2 as published by the Free Software Foundation.
+- *
+- * This program is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- */
+-
+-#undef TRACE_SYSTEM
+-#define TRACE_SYSTEM ipa
+-#define TRACE_INCLUDE_FILE ipa_trace
+-
+-#if !defined(_IPA_TRACE_H) || defined(TRACE_HEADER_MULTI_READ)
+-#define _IPA_TRACE_H
+-
+-#include <linux/tracepoint.h>
+-
+-TRACE_EVENT(
+-	intr_to_poll3,
+-
+-	TP_PROTO(unsigned long client),
+-
+-	TP_ARGS(client),
+-
+-	TP_STRUCT__entry(
+-		__field(unsigned long,	client)
+-	),
+-
+-	TP_fast_assign(
+-		__entry->client = client;
+-	),
+-
+-	TP_printk("client=%lu", __entry->client)
+-);
+-
+-TRACE_EVENT(
+-	poll_to_intr3,
+-
+-	TP_PROTO(unsigned long client),
+-
+-	TP_ARGS(client),
+-
+-	TP_STRUCT__entry(
+-		__field(unsigned long,	client)
+-	),
+-
+-	TP_fast_assign(
+-		__entry->client = client;
+-	),
+-
+-	TP_printk("client=%lu", __entry->client)
+-);
+-
+-TRACE_EVENT(
+-	idle_sleep_enter3,
+-
+-	TP_PROTO(unsigned long client),
+-
+-	TP_ARGS(client),
+-
+-	TP_STRUCT__entry(
+-		__field(unsigned long,	client)
+-	),
+-
+-	TP_fast_assign(
+-		__entry->client = client;
+-	),
+-
+-	TP_printk("client=%lu", __entry->client)
+-);
+-
+-TRACE_EVENT(
+-	idle_sleep_exit3,
+-
+-	TP_PROTO(unsigned long client),
+-
+-	TP_ARGS(client),
+-
+-	TP_STRUCT__entry(
+-		__field(unsigned long,	client)
+-	),
+-
+-	TP_fast_assign(
+-		__entry->client = client;
+-	),
+-
+-	TP_printk("client=%lu", __entry->client)
+-);
+-
+-TRACE_EVENT(
+-	rmnet_ipa_netifni3,
+-
+-	TP_PROTO(unsigned long rx_pkt_cnt),
+-
+-	TP_ARGS(rx_pkt_cnt),
+-
+-	TP_STRUCT__entry(
+-		__field(unsigned long,	rx_pkt_cnt)
+-	),
+-
+-	TP_fast_assign(
+-		__entry->rx_pkt_cnt = rx_pkt_cnt;
+-	),
+-
+-	TP_printk("rx_pkt_cnt=%lu", __entry->rx_pkt_cnt)
+-);
+-
+-TRACE_EVENT(
+-	rmnet_ipa_netifrx3,
+-
+-	TP_PROTO(unsigned long rx_pkt_cnt),
+-
+-	TP_ARGS(rx_pkt_cnt),
+-
+-	TP_STRUCT__entry(
+-		__field(unsigned long,	rx_pkt_cnt)
+-	),
+-
+-	TP_fast_assign(
+-		__entry->rx_pkt_cnt = rx_pkt_cnt;
+-	),
+-
+-	TP_printk("rx_pkt_cnt=%lu", __entry->rx_pkt_cnt)
+-);
+-
+-#endif /* _IPA_TRACE_H */
+-
+-/* This part must be outside protection */
+-#undef TRACE_INCLUDE_PATH
+-#define TRACE_INCLUDE_PATH .
+-#include <trace/define_trace.h>
+diff --git a/drivers/platform/msm/ipa/ipa_v3/rmnet_ipa.c b/drivers/platform/msm/ipa/ipa_v3/rmnet_ipa.c
+index cc11f2d..d1e10cc 100644
+--- a/drivers/platform/msm/ipa/ipa_v3/rmnet_ipa.c
++++ b/drivers/platform/msm/ipa/ipa_v3/rmnet_ipa.c
+@@ -35,7 +35,7 @@
+ #include <linux/ipa.h>
+ #include <uapi/linux/net_map.h>
+ 
+-#include "ipa_trace.h"
++#include <trace/ipa_trace_v3.h>
+ 
+ #define WWAN_METADATA_SHFT 24
+ #define WWAN_METADATA_MASK 0xFF000000
+diff --git a/drivers/soc/qcom/tracer_pkt.c b/drivers/soc/qcom/tracer_pkt.c
+index 49c9d27..9fcdd2c 100644
+--- a/drivers/soc/qcom/tracer_pkt.c
++++ b/drivers/soc/qcom/tracer_pkt.c
+@@ -15,7 +15,7 @@
+ #include <linux/types.h>
+ #include <soc/qcom/tracer_pkt.h>
+ #define CREATE_TRACE_POINTS
+-#include "tracer_pkt_private.h"
++#include <trace/tracer_pkt_private.h>
+ 
+ static unsigned qdss_tracing;
+ module_param_named(qdss_tracing_enable, qdss_tracing,
+diff --git a/drivers/soc/qcom/tracer_pkt_private.h b/drivers/soc/qcom/tracer_pkt_private.h
+deleted file mode 100644
+index fc760e6..0000000
+--- a/drivers/soc/qcom/tracer_pkt_private.h
++++ /dev/null
+@@ -1,50 +0,0 @@
+-/* Copyright (c) 2015, The Linux Foundation. All rights reserved.
+- *
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License version 2 and
+- * only version 2 as published by the Free Software Foundation.
+- *
+- * This program is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- */
+-#if !defined(_TRACER_PKT_TRACE_H) || defined(TRACE_HEADER_MULTI_READ)
+-#define _TRACER_PKT_TRACE_H
+-
+-#undef TRACE_SYSTEM
+-#define TRACE_SYSTEM tracer_pkt
+-#undef TRACE_INCLUDE_PATH
+-#define TRACE_INCLUDE_PATH .
+-#undef TRACE_INCLUDE_FILE
+-#define TRACE_INCLUDE_FILE tracer_pkt_private
+-
+-#include <linux/tracepoint.h>
+-
+-TRACE_EVENT(tracer_pkt_event,
+-
+-	TP_PROTO(uint32_t id, uint32_t *cc),
+-
+-	TP_ARGS(id, cc),
+-
+-	TP_STRUCT__entry(
+-		__field(uint32_t, id)
+-		__field(uint32_t, cc1)
+-		__field(uint32_t, cc2)
+-		__field(uint32_t, cc3)
+-	),
+-
+-	TP_fast_assign(
+-		__entry->id = id;
+-		__entry->cc1 = cc[0];
+-		__entry->cc2 = cc[1];
+-		__entry->cc3 = cc[2];
+-	),
+-
+-	TP_printk("CC - 0x%08x:0x%08x:0x%08x, ID - %d",
+-		__entry->cc1, __entry->cc2, __entry->cc3, __entry->id)
+-);
+-#endif /*_TRACER_PKT_TRACE_H*/
+-
+-#include <trace/define_trace.h>
+-
+diff --git a/drivers/usb/gadget/function/f_gsi.c b/drivers/usb/gadget/function/f_gsi.c
+index 380f62f..0901437 100644
+--- a/drivers/usb/gadget/function/f_gsi.c
++++ b/drivers/usb/gadget/function/f_gsi.c
+@@ -18,7 +18,7 @@
+ #include <linux/ipa_usb.h>
+ #include "f_gsi.h"
+ #include "rndis.h"
+-#include "debug.h"
++#include "../debug.h"
+ 
+ static unsigned int gsi_in_aggr_size;
+ module_param(gsi_in_aggr_size, uint, S_IRUGO | S_IWUSR);
+diff --git a/drivers/usb/gadget/function/f_midi.c b/drivers/usb/gadget/function/f_midi.c
+index a3d9831..587114c 100644
+--- a/drivers/usb/gadget/function/f_midi.c
++++ b/drivers/usb/gadget/function/f_midi.c
+@@ -32,7 +32,7 @@
+ #include <linux/usb/audio.h>
+ #include <linux/usb/midi.h>
+ 
+-#include "u_f.h"
++#include "../u_f.h"
+ 
+ MODULE_AUTHOR("Ben Williamson");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/usb/gadget/function/f_mtp.c b/drivers/usb/gadget/function/f_mtp.c
+index a11fdcd..7bc3378 100644
+--- a/drivers/usb/gadget/function/f_mtp.c
++++ b/drivers/usb/gadget/function/f_mtp.c
+@@ -40,7 +40,7 @@
+ #include <linux/configfs.h>
+ #include <linux/usb/composite.h>
+ 
+-#include "configfs.h"
++#include "../configfs.h"
+ 
+ #define MTP_RX_BUFFER_INIT_SIZE    1048576
+ #define MTP_BULK_BUFFER_SIZE       16384
+diff --git a/drivers/usb/gadget/function/f_rndis.c b/drivers/usb/gadget/function/f_rndis.c
+index 8798a46..1d89e30 100644
+--- a/drivers/usb/gadget/function/f_rndis.c
++++ b/drivers/usb/gadget/function/f_rndis.c
+@@ -27,7 +27,7 @@
+ #include "u_ether_configfs.h"
+ #include "u_rndis.h"
+ #include "rndis.h"
+-#include "configfs.h"
++#include "../configfs.h"
+ 
+ /*
+  * This function is an RNDIS Ethernet port -- a Microsoft protocol that's
+diff --git a/drivers/video/msm/msm_dba/msm_dba.c b/drivers/video/msm/msm_dba/msm_dba.c
+index 7a5c9d9..6b1cec8 100644
+--- a/drivers/video/msm/msm_dba/msm_dba.c
++++ b/drivers/video/msm/msm_dba/msm_dba.c
+@@ -22,7 +22,7 @@
+ #include <linux/err.h>
+ 
+ #include <video/msm_dba.h>
+-#include <msm_dba_internal.h>
++#include "msm_dba_internal.h"
+ 
+ static DEFINE_MUTEX(register_mutex);
+ 
+diff --git a/include/trace/ipa_trace.h b/include/trace/ipa_trace.h
+new file mode 100644
+index 0000000..d70abdf
+--- /dev/null
++++ b/include/trace/ipa_trace.h
+@@ -0,0 +1,135 @@
++/* Copyright (c) 2015, The Linux Foundation. All rights reserved.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 and
++ * only version 2 as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ */
++
++#undef TRACE_SYSTEM
++#define TRACE_SYSTEM ipa
++#define TRACE_INCLUDE_FILE ipa_trace
++
++#if !defined(_IPA_TRACE_H) || defined(TRACE_HEADER_MULTI_READ)
++#define _IPA_TRACE_H
++
++#include <linux/tracepoint.h>
++
++TRACE_EVENT(
++	intr_to_poll,
++
++	TP_PROTO(unsigned long client),
++
++	TP_ARGS(client),
++
++	TP_STRUCT__entry(
++		__field(unsigned long,	client)
++	),
++
++	TP_fast_assign(
++		__entry->client = client;
++	),
++
++	TP_printk("client=%lu", __entry->client)
++);
++
++TRACE_EVENT(
++	poll_to_intr,
++
++	TP_PROTO(unsigned long client),
++
++	TP_ARGS(client),
++
++	TP_STRUCT__entry(
++		__field(unsigned long,	client)
++	),
++
++	TP_fast_assign(
++		__entry->client = client;
++	),
++
++	TP_printk("client=%lu", __entry->client)
++);
++
++TRACE_EVENT(
++	idle_sleep_enter,
++
++	TP_PROTO(unsigned long client),
++
++	TP_ARGS(client),
++
++	TP_STRUCT__entry(
++		__field(unsigned long,	client)
++	),
++
++	TP_fast_assign(
++		__entry->client = client;
++	),
++
++	TP_printk("client=%lu", __entry->client)
++);
++
++TRACE_EVENT(
++	idle_sleep_exit,
++
++	TP_PROTO(unsigned long client),
++
++	TP_ARGS(client),
++
++	TP_STRUCT__entry(
++		__field(unsigned long,	client)
++	),
++
++	TP_fast_assign(
++		__entry->client = client;
++	),
++
++	TP_printk("client=%lu", __entry->client)
++);
++
++TRACE_EVENT(
++	rmnet_ipa_netifni,
++
++	TP_PROTO(unsigned long rx_pkt_cnt),
++
++	TP_ARGS(rx_pkt_cnt),
++
++	TP_STRUCT__entry(
++		__field(unsigned long,	rx_pkt_cnt)
++	),
++
++	TP_fast_assign(
++		__entry->rx_pkt_cnt = rx_pkt_cnt;
++	),
++
++	TP_printk("rx_pkt_cnt=%lu", __entry->rx_pkt_cnt)
++);
++
++TRACE_EVENT(
++	rmnet_ipa_netifrx,
++
++	TP_PROTO(unsigned long rx_pkt_cnt),
++
++	TP_ARGS(rx_pkt_cnt),
++
++	TP_STRUCT__entry(
++		__field(unsigned long,	rx_pkt_cnt)
++	),
++
++	TP_fast_assign(
++		__entry->rx_pkt_cnt = rx_pkt_cnt;
++	),
++
++	TP_printk("rx_pkt_cnt=%lu", __entry->rx_pkt_cnt)
++);
++
++#endif /* _IPA_TRACE_H */
++
++/* This part must be outside protection */
++#undef TRACE_INCLUDE_PATH
++#define TRACE_INCLUDE_PATH .
++#include <trace/define_trace.h>
+diff --git a/include/trace/ipa_trace_v3.h b/include/trace/ipa_trace_v3.h
+new file mode 100644
+index 0000000..5ea6c6d
+--- /dev/null
++++ b/include/trace/ipa_trace_v3.h
+@@ -0,0 +1,135 @@
++/* Copyright (c) 2015, The Linux Foundation. All rights reserved.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 and
++ * only version 2 as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ */
++
++#undef TRACE_SYSTEM
++#define TRACE_SYSTEM ipa
++#define TRACE_INCLUDE_FILE ipa_trace
++
++#if !defined(_IPA_TRACE_H) || defined(TRACE_HEADER_MULTI_READ)
++#define _IPA_TRACE_H
++
++#include <linux/tracepoint.h>
++
++TRACE_EVENT(
++	intr_to_poll3,
++
++	TP_PROTO(unsigned long client),
++
++	TP_ARGS(client),
++
++	TP_STRUCT__entry(
++		__field(unsigned long,	client)
++	),
++
++	TP_fast_assign(
++		__entry->client = client;
++	),
++
++	TP_printk("client=%lu", __entry->client)
++);
++
++TRACE_EVENT(
++	poll_to_intr3,
++
++	TP_PROTO(unsigned long client),
++
++	TP_ARGS(client),
++
++	TP_STRUCT__entry(
++		__field(unsigned long,	client)
++	),
++
++	TP_fast_assign(
++		__entry->client = client;
++	),
++
++	TP_printk("client=%lu", __entry->client)
++);
++
++TRACE_EVENT(
++	idle_sleep_enter3,
++
++	TP_PROTO(unsigned long client),
++
++	TP_ARGS(client),
++
++	TP_STRUCT__entry(
++		__field(unsigned long,	client)
++	),
++
++	TP_fast_assign(
++		__entry->client = client;
++	),
++
++	TP_printk("client=%lu", __entry->client)
++);
++
++TRACE_EVENT(
++	idle_sleep_exit3,
++
++	TP_PROTO(unsigned long client),
++
++	TP_ARGS(client),
++
++	TP_STRUCT__entry(
++		__field(unsigned long,	client)
++	),
++
++	TP_fast_assign(
++		__entry->client = client;
++	),
++
++	TP_printk("client=%lu", __entry->client)
++);
++
++TRACE_EVENT(
++	rmnet_ipa_netifni3,
++
++	TP_PROTO(unsigned long rx_pkt_cnt),
++
++	TP_ARGS(rx_pkt_cnt),
++
++	TP_STRUCT__entry(
++		__field(unsigned long,	rx_pkt_cnt)
++	),
++
++	TP_fast_assign(
++		__entry->rx_pkt_cnt = rx_pkt_cnt;
++	),
++
++	TP_printk("rx_pkt_cnt=%lu", __entry->rx_pkt_cnt)
++);
++
++TRACE_EVENT(
++	rmnet_ipa_netifrx3,
++
++	TP_PROTO(unsigned long rx_pkt_cnt),
++
++	TP_ARGS(rx_pkt_cnt),
++
++	TP_STRUCT__entry(
++		__field(unsigned long,	rx_pkt_cnt)
++	),
++
++	TP_fast_assign(
++		__entry->rx_pkt_cnt = rx_pkt_cnt;
++	),
++
++	TP_printk("rx_pkt_cnt=%lu", __entry->rx_pkt_cnt)
++);
++
++#endif /* _IPA_TRACE_H */
++
++/* This part must be outside protection */
++#undef TRACE_INCLUDE_PATH
++#define TRACE_INCLUDE_PATH .
++#include <trace/define_trace.h>
+diff --git a/include/trace/rndis_ipa_trace.h b/include/trace/rndis_ipa_trace.h
+new file mode 100644
+index 0000000..c0fc573
+--- /dev/null
++++ b/include/trace/rndis_ipa_trace.h
+@@ -0,0 +1,81 @@
++/* Copyright (c) 2015, The Linux Foundation. All rights reserved.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 and
++ * only version 2 as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ */
++
++#undef TRACE_SYSTEM
++#define TRACE_SYSTEM rndis_ipa
++#define TRACE_INCLUDE_FILE rndis_ipa_trace
++
++#if !defined(_RNDIS_IPA_TRACE_H) || defined(TRACE_HEADER_MULTI_READ)
++#define _RNDIS_IPA_TRACE_H
++
++#include <linux/tracepoint.h>
++
++TRACE_EVENT(
++	rndis_netif_ni,
++
++	TP_PROTO(unsigned long proto),
++
++	TP_ARGS(proto),
++
++	TP_STRUCT__entry(
++		__field(unsigned long,	proto)
++	),
++
++	TP_fast_assign(
++		__entry->proto = proto;
++	),
++
++	TP_printk("proto =%lu\n", __entry->proto)
++);
++
++TRACE_EVENT(
++	rndis_tx_dp,
++
++	TP_PROTO(unsigned long proto),
++
++	TP_ARGS(proto),
++
++	TP_STRUCT__entry(
++		__field(unsigned long,	proto)
++	),
++
++	TP_fast_assign(
++		__entry->proto = proto;
++	),
++
++	TP_printk("proto =%lu\n", __entry->proto)
++);
++
++TRACE_EVENT(
++	rndis_status_rcvd,
++
++	TP_PROTO(unsigned long proto),
++
++	TP_ARGS(proto),
++
++	TP_STRUCT__entry(
++		__field(unsigned long,	proto)
++	),
++
++	TP_fast_assign(
++		__entry->proto = proto;
++	),
++
++	TP_printk("proto =%lu\n", __entry->proto)
++);
++
++#endif /* _RNDIS_IPA_TRACE_H */
++
++/* This part must be outside protection */
++#undef TRACE_INCLUDE_PATH
++#define TRACE_INCLUDE_PATH .
++#include <trace/define_trace.h>
+diff --git a/include/trace/tracer_pkt_private.h b/include/trace/tracer_pkt_private.h
+new file mode 100644
+index 0000000..fc760e6
+--- /dev/null
++++ b/include/trace/tracer_pkt_private.h
+@@ -0,0 +1,50 @@
++/* Copyright (c) 2015, The Linux Foundation. All rights reserved.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 and
++ * only version 2 as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ */
++#if !defined(_TRACER_PKT_TRACE_H) || defined(TRACE_HEADER_MULTI_READ)
++#define _TRACER_PKT_TRACE_H
++
++#undef TRACE_SYSTEM
++#define TRACE_SYSTEM tracer_pkt
++#undef TRACE_INCLUDE_PATH
++#define TRACE_INCLUDE_PATH .
++#undef TRACE_INCLUDE_FILE
++#define TRACE_INCLUDE_FILE tracer_pkt_private
++
++#include <linux/tracepoint.h>
++
++TRACE_EVENT(tracer_pkt_event,
++
++	TP_PROTO(uint32_t id, uint32_t *cc),
++
++	TP_ARGS(id, cc),
++
++	TP_STRUCT__entry(
++		__field(uint32_t, id)
++		__field(uint32_t, cc1)
++		__field(uint32_t, cc2)
++		__field(uint32_t, cc3)
++	),
++
++	TP_fast_assign(
++		__entry->id = id;
++		__entry->cc1 = cc[0];
++		__entry->cc2 = cc[1];
++		__entry->cc3 = cc[2];
++	),
++
++	TP_printk("CC - 0x%08x:0x%08x:0x%08x, ID - %d",
++		__entry->cc1, __entry->cc2, __entry->cc3, __entry->id)
++);
++#endif /*_TRACER_PKT_TRACE_H*/
++
++#include <trace/define_trace.h>
++
+diff --git a/sound/soc/msm/apq8096-auto.c b/sound/soc/msm/apq8096-auto.c
+index cec9740..5207fed 100644
+--- a/sound/soc/msm/apq8096-auto.c
++++ b/sound/soc/msm/apq8096-auto.c
+@@ -32,7 +32,7 @@
+ #include <sound/q6core.h>
+ #include <sound/pcm_params.h>
+ #include <sound/info.h>
+-#include <device_event.h>
++#include "device_event.h"
+ #include "qdsp6v2/msm-pcm-routing-v2.h"
+ 
+ #define DRV_NAME "apq8096-auto-asoc-snd"
+diff --git a/sound/soc/msm/apq8096-i2c.c b/sound/soc/msm/apq8096-i2c.c
+index 57ddcdf..a9ae434 100644
+--- a/sound/soc/msm/apq8096-i2c.c
++++ b/sound/soc/msm/apq8096-i2c.c
+@@ -31,7 +31,7 @@
+ #include <sound/q6core.h>
+ #include <sound/pcm_params.h>
+ #include <sound/info.h>
+-#include <device_event.h>
++#include "device_event.h"
+ #include "qdsp6v2/msm-pcm-routing-v2.h"
+ #include "../codecs/wcd9xxx-common.h"
+ #include "../codecs/wcd9330.h"
+diff --git a/sound/soc/msm/msm8996.c b/sound/soc/msm/msm8996.c
+index ee6d214..d000a15 100644
+--- a/sound/soc/msm/msm8996.c
++++ b/sound/soc/msm/msm8996.c
+@@ -31,7 +31,7 @@
+ #include <sound/q6core.h>
+ #include <sound/pcm_params.h>
+ #include <sound/info.h>
+-#include <device_event.h>
++#include "device_event.h"
+ #include "qdsp6v2/msm-pcm-routing-v2.h"
+ #include "../codecs/wcd9xxx-common.h"
+ #include "../codecs/wcd9330.h"

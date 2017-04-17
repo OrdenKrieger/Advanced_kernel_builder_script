@@ -46,6 +46,9 @@ COLOR_TXT="1"
 
 # Enable/Disable clear the history of the kernel source (ONLY ON SUCCESS on error not for debug)
 CLEAR_ON_SUCCESS="1"
+
+# Enable/Disable dialog for the standalone compilation fix
+STANDALONE_FIX="1"
 #########################################################################################################################
 #########################################################################################################################
 
@@ -154,16 +157,62 @@ mv $LAZYFLASHER_DIR/*.zip $ZIP_MOVE
 mv $LAZYFLASHER_DIR/*.sha1 $ZIP_MOVE
 
 # Check if a zImage was created
+# This appears if an error happens while building the kernel/zImage
 file1="$LAZYFLASHER_DIR/zImage"
-if [ -e $file1 ]; then
+fix_done="$BUILD_DIR/.tmp/fix_done.tmp"
+fix_user_standalone="$BUILD_DIR/.tmp/fix_user_standalone.tmp"
+if [ ! -e $file1 ]; then
 	echo -e ""
 	echo -e ""
-	echo -e "\E[1;32mThe zImage of the kernel was created successful"
+	echo -e "\E[1;31mThere was no zImage created by the build process!"
+if [ ! -f $fix_done ] &&  [ ! -f $fix_user_standalone ]; then
+if [ $KERNEL_ARCH == arm64 ] ||  [ $KERNEL_ARCH == arm ]; then
+if [ $STANDALONE_FIX == 1 ]; then
+	echo -e ""
+	echo -e ""
+	echo -e "\E[1;31mDid you already applied a commit for the standalone compilation?"
+	echo -e ""
+	read -p "Apply a standalone compilation patch for your arch=$KERNEL_ARCH? (y/n) " prompt
 	tput sgr0
+if [[ $prompt == "y" || $prompt == "Y" || $prompt == "yes" || $prompt == "Yes" ]]; then
+if [ $KERNEL_ARCH == arm64 ]; then
+	cp /home/ordenkrieger/Advanced_kernel_builder_script/patches/android-3.18.patch $KERNEL_DIR
+	cd $KERNEL_DIR
+	git apply android-3.18.patch
+	rm android-3.18.patch
+	mkdir -p $BUILD_DIR/.tmp &&  touch fix_done.tmp 
+	echo "This file tells the script that the standalone fix was already applied but apparently didn't helped. :(" >> $fix_done
+	git status
+	git add .
+	exec $0
+	exit 1
+	break
+elif [ $KERNEL_ARCH == arm ]; then 
+	cp /home/ordenkrieger/Advanced_kernel_builder_script/patches/android-3.4.patch $KERNEL_DIR
+	cd $KERNEL_DIR
+	git apply android-3.4.patch
+	rm android-3.4.patch
+	mkdir -p $BUILD_DIR/.tmp &&  touch fix_done.tmp
+	echo "This file tells the script that the standalone compilation fix was already applied but apparently didn't helped. :(" >> $fix_done
+	git status
+	git add .
+	exec $0
+	exit 1
+	break
 else
-	echo -e ""
-	echo -e ""
-	echo -e "\E[1;31mThere is no zImage created by the build process!"
+	echo -e "\E[1;31mSorry but this script doesn't support a fix for your kernel architecture!"
+	tput sgr0
+fi
+elif [[ $prompt == "n" || $prompt == "N" || $prompt == "no" || $prompt == "No" ]]; then
+	mkdir -p $BUILD_DIR/.tmp &&  touch fix_user_standalone.tmp 
+	echo "This file tells the script that the standalone compilation fix is not needed." >> $fix_user_standalone
+fi
+fi
+fi
+fi
+if [ -f $fix_done ] &&  [ ! -e $file1 ]; then
+	echo -e "\E[1;31mIt looks like the standalone fix is already applied. Maybe you only need to fix smaller errors?"
+fi
 	echo -e "\E[1;31mCheck the the build history for errors and fix them in the kernel source."
 	tput sgr0
 fi
@@ -172,10 +221,10 @@ fi
 file2="$ZIP_MOVE/*.zip"
 if [ -e $file1 ] &&  [ -e $file2 ]; then
 if [ $CLEAR_ON_SUCCESS == 1 ]; then
-	rm ~/.bash_history
-	clear
+	echo -e '\0033\0143'
 fi
-	echo -e "\E[1;32mThe ZIP is created successful"
+	echo -e "\E[1;32mThe zImage of the kernel was created successful"
+	echo -e "\E[1;32mThe $BASE_VER-$VER.zip was created successful"
 	echo -e ""
 	echo -e "\E[1;32mYou can find the compiled file inside of $ZIP_MOVE"
 	echo -e ""
