@@ -28,7 +28,7 @@ KERNEL_DEFCONFIG="radioactive_defconfig"
 TOOLCHAIN_DIR="$BUILD_DIR/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-"
 
 # Set lazyflasher source git link
-LSOURCE_GIT="https://github.com/acuicultor/lazyflasher.git -b radioactive"
+LSOURCE_GIT="https://github.com/OrdenKrieger/lazyflasher.git -b radioactive"
 LAZYFLASHER_DIR="$BUILD_DIR/lazyflasher" #No changes needed
 MODULES_DIR="$LAZYFLASHER_DIR/modules" #No changes needed
 
@@ -52,8 +52,11 @@ STANDALONE_FIX="1"
 #########################################################################################################################
 #########################################################################################################################
 
-
-
+# Reset layout if the build breaks or the user stop the script
+function stop {
+	  tput sgr0
+}
+trap stop EXIT
 
 # Check if lazyflasher is present
 folder1="$LAZYFLASHER_DIR/*.*"
