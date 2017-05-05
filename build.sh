@@ -1,54 +1,8 @@
 #!/bin/bash
 #########################################################################################################################
 #########################################################################################################################
-# Kernel Details
-VER="V1.1.5_axon7"
-BASE_VER="Radioactive"
-
-# Set build folder
-BUILD_DIR="${HOME}/NucleaROM"
-
-BUILDER_NAME="ordenkrieger"
-BUILD_HOST_NAME="NuclearPowerPlant"
-
-# Set kernel source git link
-KSOURCE_GIT="https://github.com/OrdenKrieger/android_kernel_zte_msm8996.git -b radioactive"
-
-# Set kernel source folder
-KERNEL_DIR="$BUILD_DIR/kernel/zte/msm8996"
-ZIMAGE_DIR="$KERNEL_DIR/arch/arm64/boot" # Only change on soc/arch change ->arm64-arm etc.
-
-# Kernel Arch
-KERNEL_ARCH="arm64"
-
-# Set defconfig for the kernel
-KERNEL_DEFCONFIG="radioactive_defconfig"
-
-# Set kernel toolchain path
-TOOLCHAIN_DIR="$BUILD_DIR/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-"
-
-# Set lazyflasher source git link
-LSOURCE_GIT="https://github.com/OrdenKrieger/lazyflasher.git -b radioactive"
-LAZYFLASHER_DIR="$BUILD_DIR/lazyflasher" #No changes needed
-MODULES_DIR="$LAZYFLASHER_DIR/modules" #No changes needed
-
-# Set output folder
-ZIP_MOVE="$BUILD_DIR/releases"
-
-# Builder script headline
-HEADLINE_TXT="Advanced kernel builder script by OrdenKrieger"
-
-# Enable/Disable output folder cleanup dialog
-OUTPUT_EMPTY_CHECK="1"
-
-# Enable/Disable colors for the build
-COLOR_TXT="1"
-
-# Enable/Disable clear the history of the kernel source (ONLY ON SUCCESS on error not for debug)
-CLEAR_ON_SUCCESS="1"
-
-# Enable/Disable dialog for the standalone compilation fix
-STANDALONE_FIX="1"
+# Values set by config
+source config
 #########################################################################################################################
 #########################################################################################################################
 
