@@ -45,9 +45,8 @@ cd $KERNEL_DIR
 
 # Empty output?
 if [ $OUTPUT_EMPTY_CHECK == 1 ]; then
-output1="$ZIP_MOVE/*.zip"
-output2="$ZIP_MOVE/*.sha1"
-if [ -e $output1 ] &&  [ -e $output2 ]; then # Both must be there otherwise they will be ignored
+output1_rm="$ZIP_MOVE/*.*"
+if [ "$(ls -A $output1_rm)" ]; then
 	echo -e ""
 	echo -e ""
 	echo -e "\E[1;31mOutput folder contains older versions"
