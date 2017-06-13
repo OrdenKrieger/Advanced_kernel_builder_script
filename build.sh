@@ -46,7 +46,7 @@ cd $KERNEL_DIR
 # Empty output?
 if [ $OUTPUT_EMPTY_CHECK == 1 ]; then
 output1_rm="$ZIP_MOVE/*.*"
-if [ "$(ls -A $output1_rm)" ]; then
+if [ "$(ls -A $output1_rm 2>/dev/null)" ]; then
 	echo -e ""
 	echo -e ""
 	echo -e "\E[1;31mOutput folder contains older versions"
@@ -54,8 +54,8 @@ if [ "$(ls -A $output1_rm)" ]; then
 	read -p "Empty output folder? (y/n) " prompt
 	tput sgr0
 if [[ $prompt == "y" || $prompt == "Y" || $prompt == "yes" || $prompt == "Yes" ]]; then
-	rm $ZIP_MOVE/*.zip
-	rm $ZIP_MOVE/*.sha1
+	rm $ZIP_MOVE/*.zip 2>/dev/null
+	rm $ZIP_MOVE/*.sha1 2>/dev/null
 	echo -e "\E[1;31mCleanup successful!"
 	tput sgr0
 else
