@@ -1,28 +1,13 @@
 #!/bin/bash
-#########################################################################################################################
-#########################################################################################################################
-# Values set by config
+
+# Inlcude config conditions
 source config
-#########################################################################################################################
-#########################################################################################################################
 
 # Reset layout if the build breaks or the user stop the script
 function stop {
 	  tput sgr0
 }
 trap stop EXIT
-
-# Check if lazyflasher is present
-if [ "$(ls -A $LAZYFLASHER_DIR/*)" ]; then
-	echo -e ""
-	echo -e ""
-	echo -e "\E[1;32mLazyflasher is present"
-	tput sgr0
-else
-   	echo -e "\E[1;31mDownloading lazyflasher dependencie"
-   	tput sgr0
-   	git clone $LSOURCE_GIT $LAZYFLASHER_DIR
-fi
 
 # Check if kernel source is present
 if [ "$(ls -A $KERNEL_DIR/*)" ]; then
@@ -34,14 +19,7 @@ else
    git clone $KSOURCE_GIT $KERNEL_DIR
 fi
 
-# Cleanup remains of last builds
-cd $KERNEL_DIR # It's more safe to move first here. We don't want to clean any other git folder
-git clean -d -f -x > /dev/null 2>&1
-cd $LAZYFLASHER_DIR
-git clean -d -f -x > /dev/null 2>&1
-cd $KERNEL_DIR
-
-# Empty output?
+# Clean up output?
 if [ $OUTPUT_EMPTY_CHECK == 1 ]; then
 if [ "$(ls -A $ZIP_MOVE/* 2>/dev/null)" ]; then
 	echo -e ""
@@ -52,7 +30,6 @@ if [ "$(ls -A $ZIP_MOVE/* 2>/dev/null)" ]; then
 	tput sgr0
 if [[ $prompt == "y" || $prompt == "Y" || $prompt == "yes" || $prompt == "Yes" ]]; then
 	rm $ZIP_MOVE/*.zip 2>/dev/null
-	rm $ZIP_MOVE/*.sha1 2>/dev/null
 	echo -e "\E[1;31mCleanup successful!"
 	tput sgr0
 else
@@ -75,10 +52,16 @@ fi
 
 # Cleanup kernel build/out folder
 if [ "$(ls -A $OUT/* 2>/dev/null)" ]; then
-rm -rf $OUT/*
+rm -rf $OUT
+fi
+
+# Cleanup AnyKernel2 tmp files
+if [ "$(ls -A $AnyKernel2_TMP/* 2>/dev/null)" ]; then
+rm -rf $AnyKernel2_TMP
 fi
 
 # Vars
+cd $KERNEL_DIR
 export ARCH=$KERNEL_ARCH
 export SUBARCH=$KERNEL_ARCH
 export KBUILD_BUILD_USER=$BUILDER_NAME
@@ -94,36 +77,45 @@ DEFCONFIG="$KERNEL_DEFCONFIG"
 O_OUT="O=$OUT"
 make $O_OUT $DEFCONFIG
 make $O_OUT $THREAD
+cd $BUILD_DIR
 
-# Make our zips
-cp -vr $ZIMAGE_DIR/Image.gz-dtb $LAZYFLASHER_DIR/zImage
-find $KERNEL_DIR -name '*.ko' -exec cp -v {} $MODULES_DIR \;
-cd $LAZYFLASHER_DIR
-make VERSION=$VER NAME=$BASE_VER
+# Create AnyKernel2 structure
+cp -rf $AnyKernel2 $AnyKernel2_TMP
 
-if [ $COLOR_TXT == 1 ]; then
-	tput sgr0
-fi
+AnyKernel2_REPLACE="$AnyKernel2_TMP/anykernel.sh"
+sed -i "s:REPLACE_KERNEL_STRING:$AK_KERNEL_STRING:" $AnyKernel2_REPLACE
+sed -i "s:REPLACE_DEVICECHECK:$AK_DEVICECHECK:" $AnyKernel2_REPLACE
+sed -i "s:REPLACE_MODULES:$AK_MODULES:" $AnyKernel2_REPLACE
+sed -i "s:REPLACE_CLEANUP:$AK_CLEANUP:" $AnyKernel2_REPLACE
+sed -i "s:REPLACE_ONABORT_CLEANUP:$AK_CLEANUPONABORT:" $AnyKernel2_REPLACE
+sed -i "s:REPLACE_NAME1:$AK_NAME1:" $AnyKernel2_REPLACE
+sed -i "s:REPLACE_NAME2:$AK_NAME2:" $AnyKernel2_REPLACE
+sed -i "s:REPLACE_NAME3:$AK_NAME3:" $AnyKernel2_REPLACE
+sed -i "s:REPLACE_NAME4:$AK_NAME4:" $AnyKernel2_REPLACE
+sed -i "s:REPLACE_NAME5:$AK_NAME5:" $AnyKernel2_REPLACE
+sed -i "s:REPLACE_BLOCK:$AK_BLOCK:" $AnyKernel2_REPLACE
+sed -i "s:REPLACE_IS_SLOT_DEVICE:$AK_IS_SLOT_DEVICE:" $AnyKernel2_REPLACE
+sed -i "s:REPLACE_RAMDISK_COMPRESSION:$AK_RAMDISK_COMPRESSION:" $AnyKernel2_REPLACE
+
+# Add build modules to the zip
+MODULES_DIR="$AnyKernel2_TMP/modules"
+cp -vr $ZIMAGE_DIR/Image.gz-dtb $AnyKernel2_TMP/zImage
+find $OUT -name '*.ko' -exec cp -v {} $MODULES_DIR \;
+
+# Make our zip
+cd $AnyKernel2_TMP
+AK_Name="$BASE_VER-$VER"
+AK_DATE=`date +%m_%d_%Y`
+zip -r9 $AK_Name-$AK_DATE.zip *
 
 # Copy the zip to the output folder
 if [ ! -d "$ZIP_MOVE" ]; then
 mkdir $ZIP_MOVE
 fi
-cd $LAZYFLASHER_DIR
-mv $LAZYFLASHER_DIR/*.zip $ZIP_MOVE
-mv $LAZYFLASHER_DIR/*.sha1 $ZIP_MOVE
-
-# Report if zImage was created
-if [ ! -e $LAZYFLASHER_DIR/zImage ]; then
-	echo -e ""
-	echo -e ""
-	echo -e "\E[1;31mThere was no zImage created by the build process!"
-	echo -e "\E[1;31mCheck the the build history for errors and fix them in the kernel source."
-	tput sgr0
-fi
+mv $AnyKernel2_TMP/*.zip $ZIP_MOVE
 
 # Check if a zip was created and the zImage is included
-if [ -e $LAZYFLASHER_DIR/zImage ] &&  [ -e $ZIP_MOVE/*.zip ]; then
+if [ -e $AnyKernel2_TMP/zImage ] &&  [ -e $ZIP_MOVE/*.zip ]; then
 if [ $CLEAR_ON_SUCCESS == 1 ]; then
 	echo -e '\0033\0143'
 fi
@@ -136,9 +128,11 @@ fi
 	echo -e ""
 	echo -e ""
 	tput sgr0
-elif [ ! -e $file1 ] ||  [ -e "$file2" ]; then
+elif [ ! -e $AnyKernel2_TMP/zImage ] ||  [ -e $ZIP_MOVE/*.zip ]; then
 	echo -e ""
-	echo -e "\E[1;31mAn error with the zImage appeared!" 
+	echo -e "\E[1;31mAn error with the zImage appeared!"
+	echo -e "\E[1;31mThere was no zImage created by the build process!"
+	echo -e "\E[1;31mCheck the the build history for errors and fix them in the kernel source."
 	echo -e "\E[1;31mThe build process may have created a kernel.zip but this is corrupted."
 	echo -e ""
 	echo -e "\E[1;31mThe device won't boot if you flash it!"
@@ -151,4 +145,10 @@ else
 	echo -e ""
 	echo -e ""
 	tput sgr0
+fi
+
+# Clean up build output?
+if [ $OUTPUT_CLEAN_UP == 1 ]; then
+rm -rf $OUT
+rm -rf $AnyKernel2_TMP
 fi
