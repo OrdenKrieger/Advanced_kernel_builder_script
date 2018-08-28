@@ -13,8 +13,7 @@ function stop {
 trap stop EXIT
 
 # Check if lazyflasher is present
-folder1="$LAZYFLASHER_DIR/*.*"
-if [ "$(ls -A $folder1)" ]; then
+if [ "$(ls -A $LAZYFLASHER_DIR/*)" ]; then
 	echo -e ""
 	echo -e ""
 	echo -e "\E[1;32mLazyflasher is present"
@@ -26,8 +25,7 @@ else
 fi
 
 # Check if kernel source is present
-folder2="$KERNEL_DIR/*.*"
-if [ "$(ls -A $folder2)" ]; then
+if [ "$(ls -A $KERNEL_DIR/*)" ]; then
    echo -e "\E[1;32mKernel source is present"
    tput sgr0
 else
@@ -45,8 +43,7 @@ cd $KERNEL_DIR
 
 # Empty output?
 if [ $OUTPUT_EMPTY_CHECK == 1 ]; then
-output1_rm="$ZIP_MOVE/*.*"
-if [ "$(ls -A $output1_rm 2>/dev/null)" ]; then
+if [ "$(ls -A $ZIP_MOVE/* 2>/dev/null)" ]; then
 	echo -e ""
 	echo -e ""
 	echo -e "\E[1;31mOutput folder contains older versions"
@@ -76,6 +73,10 @@ if [ $COLOR_TXT == 1 ]; then
 	echo -e "\e[30m"
 fi
 
+# Cleanup kernel build/out folder
+if [ "$(ls -A $OUT/* 2>/dev/null)" ]; then
+rm -rf $OUT/*
+fi
 
 # Vars
 export ARCH=$KERNEL_ARCH
@@ -90,8 +91,9 @@ AKBS_VER="$BASE_VER$VER"
 export LOCALVERSION=~`echo $AKBS_VER`
 export LOCALVERSION=~`echo $AKBS_VER`
 DEFCONFIG="$KERNEL_DEFCONFIG"
-make $DEFCONFIG
-make $THREAD
+O_OUT="O=$OUT"
+make $O_OUT $DEFCONFIG
+make $O_OUT $THREAD
 
 # Make our zips
 cp -vr $ZIMAGE_DIR/Image.gz-dtb $LAZYFLASHER_DIR/zImage
@@ -103,79 +105,25 @@ if [ $COLOR_TXT == 1 ]; then
 	tput sgr0
 fi
 
-# Cleanup remains of the kernel build (drivers etc.)
-cd $KERNEL_DIR
-git clean -d -f -x > /dev/null 2>&1
-
-# Copy the ZIP to the Output
+# Copy the zip to the output folder
+if [ ! -d "$ZIP_MOVE" ]; then
+mkdir $ZIP_MOVE
+fi
 cd $LAZYFLASHER_DIR
 mv $LAZYFLASHER_DIR/*.zip $ZIP_MOVE
 mv $LAZYFLASHER_DIR/*.sha1 $ZIP_MOVE
 
-# Check if a zImage was created
-# This appears if an error happens while building the kernel/zImage
-file1="$LAZYFLASHER_DIR/zImage"
-fix_done="$BUILD_DIR/.tmp/fix_done.tmp"
-fix_user_standalone="$BUILD_DIR/.tmp/fix_user_standalone.tmp"
-if [ ! -e $file1 ]; then
+# Report if zImage was created
+if [ ! -e $LAZYFLASHER_DIR/zImage ]; then
 	echo -e ""
 	echo -e ""
 	echo -e "\E[1;31mThere was no zImage created by the build process!"
-if [ ! -f $fix_done ] &&  [ ! -f $fix_user_standalone ]; then
-if [ $KERNEL_ARCH == arm64 ] ||  [ $KERNEL_ARCH == arm ]; then
-if [ $STANDALONE_FIX == 1 ]; then
-	echo -e ""
-	echo -e ""
-	echo -e "\E[1;31mDid you already applied a commit for the standalone compilation?"
-	echo -e ""
-	read -p "Apply a standalone compilation patch for your arch=$KERNEL_ARCH? (y/n) " prompt
-	tput sgr0
-if [[ $prompt == "y" || $prompt == "Y" || $prompt == "yes" || $prompt == "Yes" ]]; then
-if [ $KERNEL_ARCH == arm64 ]; then
-	cp /home/ordenkrieger/Advanced_kernel_builder_script/patches/android-3.18.patch $KERNEL_DIR
-	cd $KERNEL_DIR
-	git apply android-3.18.patch
-	rm android-3.18.patch
-	mkdir -p $BUILD_DIR/.tmp &&  touch fix_done.tmp 
-	echo "This file tells the script that the standalone fix was already applied but apparently didn't helped. :(" >> $fix_done
-	git status
-	git add .
-	exec $0
-	exit 1
-	break
-elif [ $KERNEL_ARCH == arm ]; then 
-	cp /home/ordenkrieger/Advanced_kernel_builder_script/patches/android-3.4.patch $KERNEL_DIR
-	cd $KERNEL_DIR
-	git apply android-3.4.patch
-	rm android-3.4.patch
-	mkdir -p $BUILD_DIR/.tmp &&  touch fix_done.tmp
-	echo "This file tells the script that the standalone compilation fix was already applied but apparently didn't helped. :(" >> $fix_done
-	git status
-	git add .
-	exec $0
-	exit 1
-	break
-else
-	echo -e "\E[1;31mSorry but this script doesn't support a fix for your kernel architecture!"
-	tput sgr0
-fi
-elif [[ $prompt == "n" || $prompt == "N" || $prompt == "no" || $prompt == "No" ]]; then
-	mkdir -p $BUILD_DIR/.tmp &&  touch fix_user_standalone.tmp 
-	echo "This file tells the script that the standalone compilation fix is not needed." >> $fix_user_standalone
-fi
-fi
-fi
-fi
-if [ -f $fix_done ] &&  [ ! -e $file1 ]; then
-	echo -e "\E[1;31mIt looks like the standalone fix is already applied. Maybe you only need to fix smaller errors?"
-fi
 	echo -e "\E[1;31mCheck the the build history for errors and fix them in the kernel source."
 	tput sgr0
 fi
 
-# Check if lazyflasher made a .zip and this is working right
-file2="$ZIP_MOVE/*.zip"
-if [ -e $file1 ] &&  [ -e $file2 ]; then
+# Check if a zip was created and the zImage is included
+if [ -e $LAZYFLASHER_DIR/zImage ] &&  [ -e $ZIP_MOVE/*.zip ]; then
 if [ $CLEAR_ON_SUCCESS == 1 ]; then
 	echo -e '\0033\0143'
 fi
@@ -204,9 +152,3 @@ else
 	echo -e ""
 	tput sgr0
 fi
-
-# Cleanup remains of the *.zip build
-git clean -d -f -x > /dev/null 2>&1
-
-# Back to the roots
-cd $BUILD_DIR

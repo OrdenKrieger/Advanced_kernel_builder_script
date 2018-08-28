@@ -6,7 +6,9 @@ VER="V1.1.5_axon7"
 BASE_VER="Radioactive"
 
 # Set build folder
-BUILD_DIR="${HOME}/NucleaROM"
+BUILD_DIR="${HOME}/Advanced_kernel_builder_script"
+MISC_DIR="${HOME}/lineage"
+OUT="$BUILD_DIR/.out"
 
 BUILDER_NAME="ordenkrieger"
 BUILD_HOST_NAME="NuclearPowerPlant"
@@ -15,17 +17,17 @@ BUILD_HOST_NAME="NuclearPowerPlant"
 KSOURCE_GIT="https://github.com/OrdenKrieger/android_kernel_zte_msm8996.git -b radioactive"
 
 # Set kernel source folder
-KERNEL_DIR="$BUILD_DIR/kernel/zte/msm8996"
-ZIMAGE_DIR="$KERNEL_DIR/arch/arm64/boot" # Only change on soc/arch change ->arm64-arm etc.
+KERNEL_DIR="$MISC_DIR/kernel/zte/msm8996"
+ZIMAGE_DIR="$OUT/arch/arm64/boot" # Only change on soc/arch change ->arm64-arm etc.
 
 # Kernel Arch
 KERNEL_ARCH="arm64"
 
 # Set defconfig for the kernel
-KERNEL_DEFCONFIG="radioactive_defconfig"
+KERNEL_DEFCONFIG="lineageos_axon7_defconfig"
 
 # Set kernel toolchain path
-TOOLCHAIN_DIR="$BUILD_DIR/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-"
+TOOLCHAIN_DIR="$MISC_DIR/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-"
 
 # Set lazyflasher source git link
 LSOURCE_GIT="https://github.com/OrdenKrieger/lazyflasher.git -b radioactive"
@@ -46,8 +48,5 @@ COLOR_TXT="1"
 
 # Enable/Disable clear the history of the kernel source (ONLY ON SUCCESS on error not for debug)
 CLEAR_ON_SUCCESS="1"
-
-# Enable/Disable dialog for the standalone compilation fix
-STANDALONE_FIX="1"
 #########################################################################################################################
 #########################################################################################################################
