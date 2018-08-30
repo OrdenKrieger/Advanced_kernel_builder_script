@@ -120,7 +120,7 @@ if [ $CLEAR_ON_SUCCESS == 1 ]; then
 	echo -e '\0033\0143'
 fi
 	echo -e "\E[1;32mThe zImage of the kernel was created successful"
-	echo -e "\E[1;32mThe $BASE_VER-$VER.zip was created successful"
+	echo -e "\E[1;32mThe $AK_Name-$AK_DATE.zip was created successful"
 	echo -e ""
 	echo -e "\E[1;32mYou can find the compiled file inside of $ZIP_MOVE"
 	echo -e ""
