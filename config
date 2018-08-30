@@ -1,10 +1,6 @@
 #!/bin/bash
 #########################################################################################################################
 #########################################################################################################################
-# Kernel Details
-VER="V1.1.5_axon7"
-BASE_VER="Radioactive"
-
 # Default paths
 BUILD_DIR="${HOME}/Advanced_kernel_builder_script"
 MISC_DIR="${HOME}/lineage"
@@ -12,25 +8,20 @@ OUT="$BUILD_DIR/.out"
 AnyKernel2="$BUILD_DIR/AnyKernel2"
 AnyKernel2_TMP="$BUILD_DIR/.AnyKernel2"
 
-# Zip output
-ZIP_MOVE="$BUILD_DIR/releases"
-
-BUILDER_NAME="ordenkrieger"
-BUILD_HOST_NAME="NuclearPowerPlant"
-
 # Kernel source git link
 KSOURCE_GIT="https://github.com/OrdenKrieger/android_kernel_zte_msm8996.git -b radioactive"
 
-# Kernel source folder
+# Kernel
+VER="V1.1.5_axon7"
+BASE_VER="Radioactive"
 KERNEL_DIR="$MISC_DIR/kernel/zte/msm8996"
 ZIMAGE_DIR="$OUT/arch/arm64/boot" # Only change on soc/arch change ->arm64-arm etc.
-
-# Kernel Arch
 KERNEL_ARCH="arm64"
-
-# Kernel
 KERNEL_DEFCONFIG="lineageos_axon7_defconfig"
 TOOLCHAIN_DIR="$MISC_DIR/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-"
+
+# Zip output
+ZIP_MOVE="$BUILD_DIR/releases"
 
 #########################################################################################################################
 #########################################################################################################################
