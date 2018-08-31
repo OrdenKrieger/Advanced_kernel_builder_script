@@ -15,10 +15,13 @@ KSOURCE_GIT="https://github.com/OrdenKrieger/android_kernel_zte_msm8996.git -b r
 VER="V1.1.5_axon7"
 BASE_VER="Radioactive"
 KERNEL_DIR="$MISC_DIR/kernel/zte/msm8996"
-ZIMAGE_DIR="$OUT/arch/arm64/boot" # Only change on soc/arch change ->arm64-arm etc.
+KERNEL_IMAGE_DIR="$OUT/arch/arm64/boot" # Only change on soc/arch change ->arm64-arm etc.
 KERNEL_ARCH="arm64"
 KERNEL_DEFCONFIG="lineageos_axon7_defconfig"
 TOOLCHAIN_DIR="$MISC_DIR/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-"
+
+# Name of kernel image output (e.g. Image.gz-dtb, zImage)
+KERNEL_IMAGE="Image.gz-dtb"
 
 # Zip output
 ZIP_MOVE="$BUILD_DIR/releases"

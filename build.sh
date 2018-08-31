@@ -99,7 +99,7 @@ sed -i "s:REPLACE_RAMDISK_COMPRESSION:$AK_RAMDISK_COMPRESSION:" $AnyKernel2_REPL
 
 # Add build modules to the zip
 MODULES_DIR="$AnyKernel2_TMP/modules"
-cp -vr $ZIMAGE_DIR/Image.gz-dtb $AnyKernel2_TMP/zImage
+cp -vr $KERNEL_IMAGE_DIR/Image.gz-dtb $AnyKernel2_TMP/$KERNEL_IMAGE
 find $OUT -name '*.ko' -exec cp -v {} $MODULES_DIR \;
 
 # Make our zip
@@ -114,12 +114,12 @@ mkdir $ZIP_MOVE
 fi
 mv $AnyKernel2_TMP/*.zip $ZIP_MOVE
 
-# Check if a zip was created and the zImage is included
-if [ -e $AnyKernel2_TMP/zImage ] &&  [ -e $ZIP_MOVE/*.zip ]; then
+# Check if a zip was created and the kernel image is included
+if [ -e $AnyKernel2_TMP/$KERNEL_IMAGE ] &&  [ -e $ZIP_MOVE/*.zip ]; then
 if [ $CLEAR_ON_SUCCESS == 1 ]; then
 	echo -e '\0033\0143'
 fi
-	echo -e "\E[1;32mThe zImage of the kernel was created successful"
+	echo -e "\E[1;32mThe kernel $KERNEL_IMAGE was created successful"
 	echo -e "\E[1;32mThe $AK_Name-$AK_DATE.zip was created successful"
 	echo -e ""
 	echo -e "\E[1;32mYou can find the compiled file inside of $ZIP_MOVE"
@@ -128,10 +128,10 @@ fi
 	echo -e ""
 	echo -e ""
 	tput sgr0
-elif [ ! -e $AnyKernel2_TMP/zImage ] ||  [ -e $ZIP_MOVE/*.zip ]; then
+elif [ ! -e $AnyKernel2_TMP/$KERNEL_IMAGE ] ||  [ -e $ZIP_MOVE/*.zip ]; then
 	echo -e ""
-	echo -e "\E[1;31mAn error with the zImage appeared!"
-	echo -e "\E[1;31mThere was no zImage created by the build process!"
+	echo -e "\E[1;31mAn error with kernel appeared!"
+	echo -e "\E[1;31mThere was no $KERNEL_IMAGE created by the build process!"
 	echo -e "\E[1;31mCheck the the build history for errors and fix them in the kernel source."
 	echo -e "\E[1;31mThe build process may have created a kernel.zip but this is corrupted."
 	echo -e ""
