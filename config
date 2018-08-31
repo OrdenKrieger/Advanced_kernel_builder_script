@@ -83,7 +83,7 @@ COLOR_TXT="1"
 # Enable/Disable clear kernel build history (ONLY ON SUCCESS; on error not for debug)
 CLEAR_ON_SUCCESS="1"
 
-# Enable/Disable clean up of build folders
+# Enable/Disable clean up of build folders (ONLY ON SUCCESS; on error not for debug)
 OUTPUT_CLEAN_UP="1"
 
 #########################################################################################################################

@@ -119,6 +119,10 @@ if [ -e $AnyKernel2_TMP/$KERNEL_IMAGE ] &&  [ -e $ZIP_MOVE/*.zip ]; then
 if [ $CLEAR_ON_SUCCESS == 1 ]; then
 	echo -e '\0033\0143'
 fi
+if [ $OUTPUT_CLEAN_UP == 1 ]; then
+rm -rf $OUT
+rm -rf $AnyKernel2_TMP
+fi
 	echo -e "\E[1;32mThe kernel $KERNEL_IMAGE was created successful"
 	echo -e "\E[1;32mThe $AK_Name-$AK_DATE.zip was created successful"
 	echo -e ""
@@ -145,10 +149,4 @@ else
 	echo -e ""
 	echo -e ""
 	tput sgr0
-fi
-
-# Clean up build output?
-if [ $OUTPUT_CLEAN_UP == 1 ]; then
-rm -rf $OUT
-rm -rf $AnyKernel2_TMP
 fi
