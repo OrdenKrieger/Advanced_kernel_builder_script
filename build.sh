@@ -96,9 +96,11 @@ sed -i "s:REPLACE_IS_SLOT_DEVICE:$AK_IS_SLOT_DEVICE:" $AnyKernel2_REPLACE
 sed -i "s:REPLACE_RAMDISK_COMPRESSION:$AK_RAMDISK_COMPRESSION:" $AnyKernel2_REPLACE
 
 # Add build modules to the zip
-MODULES_DIR="$AnyKernel2_TMP/modules"
+if [ $AK_MODULES == 1 ]; then
+mkdir $AnyKernel2_TMP/modules
 cp -vr $OUT/arch/$KERNEL_ARCH/boot/Image.gz-dtb $AnyKernel2_TMP/$KERNEL_IMAGE
-find $OUT -name '*.ko' -exec cp -v {} $MODULES_DIR \;
+find $OUT -name '*.ko' -exec cp -v {} $AnyKernel2_TMP/modules \;
+fi
 
 # Make our zip
 cd $AnyKernel2_TMP
