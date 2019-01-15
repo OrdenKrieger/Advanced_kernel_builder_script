@@ -14,7 +14,7 @@ device.name2=REPLACE_NAME2
 device.name3=REPLACE_NAME3
 device.name4=REPLACE_NAME4
 device.name5=REPLACE_NAME5
-supported.versions=
+supported.versions=REPLACE_SUPPORTED_VERSIONS
 '; } # end properties
 
 # shell variables

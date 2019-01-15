@@ -3,10 +3,9 @@
 #########################################################################################################################
 # Default paths
 BUILD_DIR="${HOME}/Advanced_kernel_builder_script"
-MISC_DIR="${HOME}/lineage"
-OUT="$BUILD_DIR/.out"
-AnyKernel2="$BUILD_DIR/AnyKernel2"
-AnyKernel2_TMP="$BUILD_DIR/.AnyKernel2"
+OUT="$BUILD_DIR/.out" # don't touch
+AnyKernel2="$BUILD_DIR/AnyKernel2" # don't touch
+AnyKernel2_TMP="$BUILD_DIR/.AnyKernel2" # don't touch
 
 # Kernel source git link
 KSOURCE_GIT="https://github.com/OrdenKrieger/android_kernel_zte_msm8996.git -b radioactive"
@@ -14,11 +13,10 @@ KSOURCE_GIT="https://github.com/OrdenKrieger/android_kernel_zte_msm8996.git -b r
 # Kernel
 VER="V1.1.5_axon7"
 BASE_VER="Radioactive"
-KERNEL_DIR="$MISC_DIR/kernel/zte/msm8996"
-KERNEL_IMAGE_DIR="$OUT/arch/arm64/boot" # Only change on soc/arch change ->arm64-arm etc.
+KERNEL_DIR="${HOME}/lineage/kernel/zte/msm8996"
 KERNEL_ARCH="arm64"
 KERNEL_DEFCONFIG="lineageos_axon7_defconfig"
-TOOLCHAIN_DIR="$MISC_DIR/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-"
+TOOLCHAIN_DIR="${HOME}/lineage/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-"
 
 # Name of kernel image output (e.g. Image.gz-dtb, zImage)
 KERNEL_IMAGE="Image.gz-dtb"
@@ -69,6 +67,10 @@ AK_IS_SLOT_DEVICE="0"
 # Allows automatically repacking the ramdisk with the format detected during unpack, changing auto to gz, lzo, lzma, xz, bz2, lz4, or lz4-l (for lz4 legacy) instead forces the repack as that format
 AK_RAMDISK_COMPRESSION="auto"
 
+# AK_SUPPORTED_VERSIONS=""
+# will match against ro.build.version.release from the current ROM's build.prop. It can be set to a list or range. As a list, e.g. 7.1.2 or 8.1.0, 9 it will look for exact matches, as a range, e.g. 7.1.2 - 9 it will check to make sure the current version falls within those limits. Whitespace optional, and supplied version values should be in the same number format they are in the build.prop value for that Android version.
+AK_SUPPORTED_VERSIONS=""
+
 #########################################################################################################################
 #########################################################################################################################
 # AKBS headline
@@ -78,7 +80,9 @@ HEADLINE_TXT="Advanced kernel builder script by OrdenKrieger"
 OUTPUT_EMPTY_CHECK="1"
 
 # Enable/Disable colors for the build
-COLOR_TXT="1"
+COLOR_BUILD_PROCESS="1"
+TERMINAL_BACKGROUND_COLOR="\e[40m"
+TERMINAL_TEXT_COLOR="\e[1;34m"
 
 # Enable/Disable clear kernel build history (ONLY ON SUCCESS; on error not for debug)
 CLEAR_ON_SUCCESS="1"

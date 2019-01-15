@@ -38,17 +38,16 @@ fi
 fi
 fi
 
+if [ $COLOR_BUILD_PROCESS == 1 ]; then
+	echo -e $TERMINAL_BACKGROUND_COLOR
+	echo -e $TERMINAL_TEXT_COLOR
+fi
+
 echo -e ""
 echo -e ""
-echo -e "\e[1;4m$HEADLINE_TXT"
+echo -e "|==|\e[1;31m$HEADLINE_TXT$TERMINAL_TEXT_COLOR|==|"
 echo -e ""
 echo -e "" 
-tput sgr0
-
-if [ $COLOR_TXT == 1 ]; then
-	echo -e "\e[43m"
-	echo -e "\e[30m"
-fi
 
 # Cleanup kernel build/out folder
 if [ "$(ls -A $OUT/* 2>/dev/null)" ]; then
@@ -93,13 +92,14 @@ sed -i "s:REPLACE_NAME2:$AK_NAME2:" $AnyKernel2_REPLACE
 sed -i "s:REPLACE_NAME3:$AK_NAME3:" $AnyKernel2_REPLACE
 sed -i "s:REPLACE_NAME4:$AK_NAME4:" $AnyKernel2_REPLACE
 sed -i "s:REPLACE_NAME5:$AK_NAME5:" $AnyKernel2_REPLACE
+sed -i "s:REPLACE_SUPPORTED_VERSIONS:$AK_SUPPORTED_VERSIONS:" $AnyKernel2_REPLACE
 sed -i "s:REPLACE_BLOCK:$AK_BLOCK:" $AnyKernel2_REPLACE
 sed -i "s:REPLACE_IS_SLOT_DEVICE:$AK_IS_SLOT_DEVICE:" $AnyKernel2_REPLACE
 sed -i "s:REPLACE_RAMDISK_COMPRESSION:$AK_RAMDISK_COMPRESSION:" $AnyKernel2_REPLACE
 
 # Add build modules to the zip
 MODULES_DIR="$AnyKernel2_TMP/modules"
-cp -vr $KERNEL_IMAGE_DIR/Image.gz-dtb $AnyKernel2_TMP/$KERNEL_IMAGE
+cp -vr $OUT/arch/$KERNEL_ARCH/boot/Image.gz-dtb $AnyKernel2_TMP/$KERNEL_IMAGE
 find $OUT -name '*.ko' -exec cp -v {} $MODULES_DIR \;
 
 # Make our zip
