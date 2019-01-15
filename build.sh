@@ -32,8 +32,6 @@ if [[ $prompt == "y" || $prompt == "Y" || $prompt == "yes" || $prompt == "Yes" ]
 	rm $ZIP_MOVE/*.zip 2>/dev/null
 	echo -e "\E[1;31mCleanup successful!"
 	tput sgr0
-else
-	echo -e ""
 fi
 fi
 fi
